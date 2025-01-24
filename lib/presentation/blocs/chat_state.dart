@@ -1,3 +1,5 @@
+import 'package:fluttergptchat/domain/entities/message.dart';
+
 abstract class ChatState {}
 
 class ChatInitial extends ChatState {}
@@ -5,13 +7,13 @@ class ChatInitial extends ChatState {}
 class ChatLoading extends ChatState {}
 
 class ChatSuccess extends ChatState {
-  final List<Map<String, String>> messages;
+  final Message botMessage;
 
-  ChatSuccess(this.messages);
+  ChatSuccess(this.botMessage);
 }
 
 class ChatError extends ChatState {
-  final String errorMessage;
+  final String message;
 
-  ChatError(this.errorMessage);
+  ChatError(this.message);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttergptchat/domain/usecases/start_speech_recognition_usecase.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'speech_event.dart';
@@ -7,7 +8,8 @@ import 'speech_state.dart';
 class SpeechBloc extends Bloc<SpeechEvent, SpeechState> {
   final SpeechToText _speechToText = SpeechToText();
 
-  SpeechBloc() : super(SpeechInitial()) {
+  SpeechBloc([StartSpeechRecognitionUseCase? startSpeechRecognitionUseCase])
+      : super(SpeechInitial()) {
     on<StartSpeechRecognition>(_onStartSpeechRecognition);
     on<StopSpeechRecognition>(_onStopSpeechRecognition);
   }
