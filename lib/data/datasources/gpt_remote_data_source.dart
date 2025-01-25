@@ -8,20 +8,28 @@ class GPTRemoteDataSourceImpl {
   GPTRemoteDataSourceImpl(this.apiKey);
 
   Future<Message> sendMessageToGPT(String userInput) async {
-    final Uri url = Uri.parse('https://api.openai.com/v1/completions');
+    // Use the correct endpoint for chat completions (GPT-3.5 Turbo or GPT-4)
+    final Uri url = Uri.parse('https://api.openai.com/v1/chat/completions');
 
-    // Ensure body is JSON-encoded
+    // Ensure body is JSON-encoded and matches the API requirements
     final Map<String, dynamic> body = {
-      'model': 'text-davinci-003',
-      'prompt': userInput,
-      'max_tokens': 100,
+      'model': 'gpt-3.5-turbo', // Updated to GPT-3.5 Turbo
+      'messages': [
+        {
+          'role': 'user',
+          'content': userInput,
+        },
+      ],
+      'max_tokens': 100, // Optional: Limit the response length
+      'temperature':
+          0.7, // Optional: Control creativity (0 = deterministic, 1 = creative)
     };
 
     final response = await http.post(
       url,
       headers: {
         'Authorization': 'Bearer $apiKey',
-        'Content-Type': 'application/json', // Fixing the Content-Type to JSON
+        'Content-Type': 'application/json',
       },
       body: jsonEncode(body), // Encode body as JSON
     );
@@ -29,14 +37,17 @@ class GPTRemoteDataSourceImpl {
     // Check if the API response is successful
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      // Extract the response message from the correct field
+      final responseMessage = data['choices'][0]['message']['content'].trim();
       return Message(
         sender: 'bot',
-        text: data['choices'][0]['text'].trim(),
+        text: responseMessage,
       );
     } else {
       // Log additional response details for debugging
       throw Exception(
-          'Failed to fetch data. Status code: ${response.statusCode}, Response: ${response.body}');
+        'Failed to fetch data. Status code: ${response.statusCode}, Response: ${response.body}',
+      );
     }
   }
 }
